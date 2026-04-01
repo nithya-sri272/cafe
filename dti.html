@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Cafeteria Queueless App</title>
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #0f2027;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 20px;
+}
+h1,h2 { text-align:center; }
+.section { display:none; background: rgba(10,10,30,0.9); padding:20px; border-radius:12px; margin-bottom:20px; }
+input, select, button { padding:10px; margin:5px; border-radius:6px; border:none; }
+button { background:#1e3c72; color:#fff; cursor:pointer; font-weight:bold; }
+button:hover { background:#2a5298; }
+.navbar { display:flex; justify-content:space-between; background:#1e3c72; padding:10px 20px; border-radius:0 0 12px 12px; }
+.navbar button { background:#0f2027; padding:6px 12px; }
+.menu-item, .cart-item { display:flex; justify-content:space-between; margin:10px 0; background: rgba(20,20,50,0.5); padding:10px; border-radius:6px; }
+
+/* Timeline styles */
+.timeline {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin: 40px 0;
+}
+.timeline::before {
+    content:''; position:absolute; top:12px; left:0; width:100%; height:4px; background:#444; z-index:0;
+}
+.step { text-align:center; position: relative; z-index:1; }
+.step .circle { width:24px; height:24px; border-radius:50%; background:#555; margin:auto; line-height:24px; color:#fff; font-weight:bold; }
+.step.completed .circle { background:#00ff00; }
+.step.completed .label { color:#00ff00; }
+.step .label { margin-top:8px; font-size:14px; }
+#emailStatus { text-align:center; margin-top:10px; font-weight:bold; }
+</style>
+</head>
+<body>
+
+<div class="container">
+<h1>Smart Cafeteria Queueless App</h1>
+
+<!-- Navbar -->
+<div class="navbar" id="navbar" style="display:none;">
+    <div>
+        <button onclick="showPage('menuPage')">Menu</button>
+        <button onclick="showPage('cartPage')">Cart (<span id="cartCount">0</span>)</button>
+    </div>
+    <div>
+        <button onclick="showPage('profilePage')">Profile</button>
+        <button onclick="logout()">Logout</button>
+    </div>
+</div>
+
+<!-- Login Page -->
+<div class="section" id="loginPage">
+    <h2>Login</h2>
+    <input type="text" id="name" placeholder="Your Name"><br>
+    <input type="email" id="email" placeholder="Email"><br>
+    <input type="password" id="password" placeholder="Password"><br>
+    <button onclick="login()">Login</button>
+</div>
+<div id="upiPayment" style="display:none; margin:10px 0;">
+    <p>Pay using UPI: <b>bharatpe.9s0h0d7l2s702950@fbpe</b></p>
+    <button id="upiButton">Pay via UPI</button>
+    <div id="upiQRCode" style="margin-top:10px;"></div>
+</div>
+
+<!-- Profile Page -->
+<div class="section" id="profilePage">
+    <h2>User Profile</h2>
+    <p><b>Name:</b> <span id="profileName"></span></p>
+    <p><b>Email:</b> <span id="profileEmail"></span></p>
+    <button onclick="showPage('menuPage')">Back to Menu</button>
+</div>
+
+<!-- Menu Page -->
+<div class="section" id="menuPage">
+    <h2>Menu</h2>
+    <div class="menu-item"><span>Veg noodles - 60/-</span><button onclick="addToCart('Veg noodles',60)">Add to Cart</button></div>
+    <div class="menu-item"><span>Chicken noodles - 80/-</span><button onclick="addToCart('Chicken noodles',80)">Add to Cart</button></div>
+    <div class="menu-item"><span>Egg noodles - 70/-</span><button onclick="addToCart('Egg Noodles',70)">Add to Cart</button></div>
+    <div class="menu-item"><span>Veg Friedrice - 60/-</span><button onclick="addToCart('Veg Friedrice',60)">Add to Cart</button></div>
+    <div class="menu-item"><span>Egg Friedrice - 70/-</span><button onclick="addToCart('Egg Friedrice',70)">Add to Cart</button></div>
+<div class="menu-item"><span>Chicken Friedrice - 80/-</span><button onclick="addToCart('Chicken Friedrice',80)">Add to Cart</button></div>
+<div class="menu-item"><span>Meals - 70/-</span><button onclick="addToCart('Meals',70)">Add to Cart</button></div>
+<div class="menu-item"><span>Parotta - 40/-</span><button onclick="addToCart('Parotta',40)">Add to Cart</button></div>
+<div class="menu-item"><span>Masala Dosa - 35/-</span><button onclick="addToCart('Masala Dosa',35)">Add to Cart</button></div>
+<div class="menu-item"><span>Rava Dosa - 35/-</span><button onclick="addToCart('Rava Dosa',35)">Add to Cart</button></div>
+<div class="menu-item"><span> Mysore Bonda - 25/-</span><button onclick="addToCart('Mysore Bonda',25)">Add to Cart</button></div>
+<div class="menu-item"><span>Egg Dosa - 45/-</span><button onclick="addToCart('Egg Dosa',45)">Add to Cart</button></div>
+<div class="menu-item"><span>Onion Dosa - 30/-</span><button onclick="addToCart('Onion Dosa',30)">Add to Cart</button></div>
+<div class="menu-item"><span>Pesarattu - 35/-</span><button onclick="addToCart('Pesarattu',35)">Add to Cart</button></div>
+<div class="menu-item"><span>Punugu - 25/-</span><button onclick="addToCart('Punugu',25)">Add to Cart</button></div>
+<div class="menu-item"><span>Gare - 25/-</span><button onclick="addToCart('Gare',25)">Add to Cart</button></div>
+<div class="menu-item"><span>Idly - 25/-</span><button onclick="addToCart('Idly',25)">Add to Cart</button></div>
+<div class="menu-item"><span>Tea - 15/-</span><button onclick="addToCart('Tea',15)">Add to Cart</button></div>
+<div class="menu-item"><span>Coffee - 15/-</span><button onclick="addToCart('Coffee',15)">Add to Cart</button></div>
+<div class="menu-item"><span>Boost - 20/-</span><button onclick="addToCart('Boost',20)">Add to Cart</button></div>
+<div class="menu-item"><span>Horlicks - 20/-</span><button onclick="addToCart('Horlicks',20)">Add to Cart</button></div>
+</div>
+
+<!-- Cart Page -->
+<div class="section" id="cartPage">
+    <h2>Your Cart</h2>
+    <div id="cartItems"></div>
+    <p><b>Total: ₹<span id="cartTotal">0</span></b></p>
+    <input type="text" id="address" placeholder="Enter Delivery Address"><br>
+    <select id="paymentMethod">
+        <option value="COD">Cash on Delivery</option>
+        <option value="UPI">UPI / Online Payment</option>
+    </select><br>
+    <button onclick="placeOrder()">Place Order</button>
+
+    <!-- UPI payment section -->
+	<canvas id="upiQRCode" style="margin-top:10px;"></canvas>    
+</div>
+<!-- Order Status Page -->
+<div class="section" id="orderPage">
+    <h2>Order Status</h2>
+    <p id="tokenDisplay"></p>
+    <div class="timeline" id="timeline">
+        <div class="step" id="step1"><div class="circle">1</div><div class="label">Placed</div></div>
+        <div class="step" id="step2"><div class="circle">2</div><div class="label">Preparing</div></div>
+        <div class="step" id="step3"><div class="circle">3</div><div class="label">Ready</div></div>
+        <div class="step" id="step4"><div class="circle">4</div><div class="label">Delivered</div></div>
+    </div>
+    <p id="billText"></p>
+    <p id="emailStatus"></p>
+    <button onclick="newOrder()">New Order</button>
+</div>
+
+<!-- EmailJS SDK -->
+<script>
+emailjs.init("38vUOIse93VMn5XWL"); // user ID
+
+let user = {};
+let cart = [];
+let orders = [];
+let token = 0;
+
+function showPage(pageId){
+    document.querySelectorAll('.section').forEach(s=>s.style.display='none');
+    document.getElementById(pageId).style.display='block';
+}
+showPage('loginPage');
+
+function login(){
+    const name=document.getElementById('name').value.trim();
+    const email=document.getElementById('email').value.trim();
+    const password=document.getElementById('password').value;
+    if(!name||!email||!password){ alert('Fill all login details!'); return;}
+    user={name,email,password};
+    document.getElementById('profileName').innerText=name;
+    document.getElementById('profileEmail').innerText=email;
+    document.getElementById('navbar').style.display='flex';
+    updateCart();
+    showPage('menuPage');
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script>
+function logout(){
+    user={}; cart=[]; orders=[]; token=0;
+    document.getElementById('navbar').style.display='none';
+    showPage('loginPage');
+    updateCart();
+}
+
+function addToCart(item,price){
+    cart.push({item,price});
+    updateCart();
+}
+
+function updateCart(){
+    const cartItems=document.getElementById('cartItems');
+    cartItems.innerHTML='';
+    let total=0;
+    cart.forEach(c=>{
+        cartItems.innerHTML+=`<div class="cart-item"><span>${c.item} - ₹${c.price}</span></div>`;
+        total+=c.price;
+    });
+    document.getElementById('cartTotal').innerText=total;
+    document.getElementById('cartCount').innerText=cart.length;
+}
+
+function placeOrder(){
+    if(cart.length===0){ alert('Cart is empty!'); return;}
+    const address=document.getElementById('address').value.trim() || 'Not Provided';
+    const payment=document.getElementById('paymentMethod').value;
+    token=Math.floor(Math.random()*9000)+1000;
+    orders=cart.map(c=>({...c,status:'Placed'}));
+    cart=[]; updateCart();
+    showPage('orderPage');
+    document.getElementById('tokenDisplay').innerText=`Hello ${user.name}, your token number is: #${token}`;
+    updateBill(address,payment);
+    document.getElementById('emailStatus').innerText="Sending email...";
+    sendEmailConfirmation(address,payment);
+    simulateTimeline();
+}
+
+function simulateTimeline(){
+    const steps = ['step1','step2','step3','step4'];
+    steps.forEach((id,i)=>{
+        setTimeout(()=>{document.getElementById(id).classList.add('completed');}, i*3000);
+    });
+}
+
+function updateBill(address,payment){
+    const total=orders.reduce((sum,o)=>sum+o.price,0);
+    document.getElementById('billText').innerHTML=`Total: ₹${total}<br>Payment: ${payment}<br>Address: ${address}`;
+}
+
+function sendEmailConfirmation(address,payment){
+    const total=orders.reduce((sum,o)=>sum+o.price,0);
+    const itemsList=orders.map(o=>o.item).join(', ');
+    const templateParams={
+        name:user.name,
+        token:token,
+        orders:itemsList,
+        total:total,
+        payment:payment,
+        address:address,
+        email:user.email
+    };
+    emailjs.send('service_yci2p5c','template_d17lh68',templateParams)
+    .then(r=>{
+        console.log('Email sent', r);
+        document.getElementById('emailStatus').innerText="✅ Confirmation email sent to " + user.email;
+    }).catch(e=>{
+        console.log('Email failed', e);
+        document.getElementById('emailStatus').innerText="❌ Email failed. Check EmailJS setup.";
+    });
+}
+
+function newOrder(){
+    orders=[]; token=0; cart=[];
+    document.getElementById('address').value='';
+    document.getElementById('paymentMethod').value='COD';
+    document.querySelectorAll('.step').forEach(s=>s.classList.remove('completed'));
+    document.getElementById('emailStatus').innerText='';
+    showPage('menuPage'); updateCart();
+}
+<!-- QRCode.js library -->
+<!-- Add QRCode.js library -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+<script>
+// Show/hide UPI options when payment method changes
+paymentSelect.addEventListener('change', function() {
+window.onload = function() {
+    const paymentSelect = document.getElementById('paymentMethod');
+    const upiDiv = document.getElementById('upiPayment');
+    const upiButton = document.getElementById('upiButton');
+    const upiQRCode = document.getElementById('upiQRCode');
+
+    paymentSelect.addEventListener('change', function() {
+        if(this.value === 'UPI'){
+            upiDiv.style.display = 'block';
+        } else {
+            upiDiv.style.display = 'none';
+            const ctx = upiQRCode.getContext('2d');
+            ctx.clearRect(0,0,upiQRCode.width,upiQRCode.height);
+        }
+    });
+}
+    if(this.value === 'UPI'){
+        upiDiv.style.display = 'block';
+    } else {
+        upiDiv.style.display = 'none';
+const ctx = upiQRCode.getContext('2d');
+ctx.clearRect(0, 0, upiQRCode.width, upiQRCode.height);    }
+});
+
+// Called after user places order to update UPI QR / link
+function showUpi(total){
+    const upiId = "bharatpe.9s0h0d7l2s702950@fbpe";
+    const name = "Smart Cafeteria";
+    const upiLink = `upi://pay?pa=${upiId}&pn=${encodeURIComponent(name)}&am=${total}&cu=INR`;
+
+    const canvas = document.getElementById('upiQRCode');
+
+    // Clear old QR
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Mobile → open UPI apps
+    if(/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)){
+        upiButton.style.display = 'inline-block';
+        upiButton.onclick = () => {
+            window.location.href = upiLink;
+        };
+    } 
+    else {
+        // Desktop → show QR
+        upiButton.style.display = 'none';
+
+        QRCode.toCanvas(canvas, upiLink, {
+            width: 200
+        }, function (error) {
+            if (error) console.error(error);
+        });
+    }
+}
+// Modify placeOrder to show UPI QR / button
+function placeOrder(){
+    if(cart.length===0){ alert('Cart is empty!'); return;}
+    const address = document.getElementById('address').value.trim() || 'Not Provided';
+    const payment = paymentSelect.value;
+    token = Math.floor(Math.random()*9000)+1000;
+    orders = cart.map(c => ({...c,status:'Placed'}));
+    cart = []; updateCart();
+    showPage('orderPage');
+    document.getElementById('tokenDisplay').innerText=`Hello ${user.name}, your token number is: #${token}`;
+    updateBill(address, payment);
+    document.getElementById('emailStatus').innerText="Sending email...";
+    sendEmailConfirmation(address,payment);
+
+    // Show UPI if selected
+    if(payment==='UPI'){
+        const total = orders.reduce((sum,o)=>sum+o.price,0);
+        showUpi(total);
+    }
+
+    simulateTimeline();
+}
+</script>
+</div>
+</body>
+</html>
